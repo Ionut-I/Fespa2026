@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="FESPA 2026">
+<meta name="theme-color" content="#185FA5">
+<title>FESPA 2026 — ProSEP</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+:root{
+  --ac:#185FA5;--acl:#E6F1FB;--gr:#3B6D11;--grl:#EAF3DE;
+  --bg:#ffffff;--bg2:#f5f5f5;--bg3:#eeeeee;
+  --txt:#111111;--txt2:#666666;--txt3:#999999;
+  --brd:#e0e0e0;--brd2:#cccccc;
+  --danger:#c62828;
+  --r:12px;--fs:16px;--fss:13px;--fsl:18px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#111111;--bg2:#1c1c1c;--bg3:#272727;
+    --txt:#f0f0f0;--txt2:#aaaaaa;--txt3:#666666;
+    --brd:#2c2c2c;--brd2:#3c3c3c;
+  }
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-size:var(--fs);color:var(--txt);background:var(--bg)}
+input,select,textarea,button{font-family:inherit;font-size:var(--fs);color:var(--txt);background:var(--bg)}
+input,select,textarea{border:1px solid var(--brd2);border-radius:8px;padding:10px 12px;width:100%;outline:none;background:var(--bg)}
+input:focus,textarea:focus{border-color:var(--ac)}
+textarea{resize:vertical;line-height:1.5}
+button{cursor:pointer;border:none;background:transparent}
+
+/* LAYOUT */
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+.hdr{padding:.75rem 1rem;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--bg);flex-shrink:0}
+.hdr h1{font-size:15px;font-weight:600;line-height:1.2}
+.hdr p{font-size:11px;color:var(--txt2);margin-top:1px}
+.hdr-btns{display:flex;gap:6px}
+.ibtn{width:40px;height:40px;border-radius:50%;border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;color:var(--txt);flex-shrink:0}
+.ibtn i{font-size:20px}
+.ibtn.add{background:var(--ac);color:#fff;border-color:var(--ac)}
+.info-bar{padding:.3rem 1rem;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--bg2);flex-shrink:0}
+.info-bar span{font-size:11px;color:var(--txt2);display:flex;align-items:center;gap:5px}
+.info-bar button{font-size:11px;padding:3px 9px;border:1px solid var(--brd);border-radius:4px;color:var(--ac)}
+.tabs{display:flex;border-bottom:1px solid var(--brd);background:var(--bg);flex-shrink:0}
+.tab{flex:1;padding:.625rem .5rem;font-size:13px;border-bottom:2px solid transparent;color:var(--txt2);text-align:center;display:flex;align-items:center;justify-content:center;gap:4px}
+.tab.active{border-bottom-color:var(--ac);color:var(--txt);font-weight:600}
+.tab-n{background:var(--bg2);border-radius:8px;font-size:10px;padding:1px 6px}
+.tab.active .tab-n{background:var(--acl);color:var(--ac)}
+.panel{display:none;overflow-y:auto;flex:1;padding:.75rem 1rem 2rem}
+.panel.active{display:block}
+
+/* CARDS */
+.vcard{background:var(--bg);border:1px solid var(--brd);border-radius:var(--r);margin-bottom:.625rem;overflow:hidden}
+.vcard-hd{padding:.875rem 1rem;display:flex;align-items:flex-start;gap:.625rem;cursor:pointer;-webkit-user-select:none;user-select:none}
+.avatar{width:44px;height:44px;border-radius:9px;background:var(--acl);color:var(--ac);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;flex-shrink:0}
+.vcard-info{flex:1;min-width:0}
+.vcard-name{font-weight:600;font-size:var(--fsl);line-height:1.3}
+.vcard-meta{font-size:11px;color:var(--txt2);margin-top:4px;display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.stag{font-size:11px;font-weight:600;background:var(--acl);color:var(--ac);padding:2px 8px;border-radius:10px}
+.exp-icon{font-size:20px;color:var(--txt3);flex-shrink:0;line-height:1;margin-top:3px}
+.vcard-body{display:none;border-top:1px solid var(--brd)}
+.vcard-body.open{display:block}
+
+/* SECTIONS */
+.vs{padding:.75rem 1rem}
+.vs+.vs{border-top:1px solid var(--brd)}
+.vs-title{font-size:13px;font-weight:600;color:var(--txt2);margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between}
+.vs-add{font-size:13px;padding:4px 10px;border-radius:6px;border:1px solid var(--brd);color:var(--ac)}
+.back-row{display:flex;align-items:center;gap:5px;padding:.625rem 1rem;font-size:13px;font-weight:600;color:var(--ac);background:var(--acl);border:none;width:100%;text-align:left}
+.save-btn{width:100%;padding:11px;font-size:var(--fs);font-weight:600;background:var(--ac);color:#fff;border:none;border-radius:10px;margin-top:.625rem;display:flex;align-items:center;justify-content:center;gap:6px}
+.save-btn.ok{background:var(--gr)}
+.del-btn{font-size:12px;padding:3px 8px;border-radius:4px;border:1px solid var(--brd);color:var(--danger)}
+
+/* TODOS */
+.todo-item{display:flex;align-items:center;gap:.625rem;padding:7px 0;min-height:44px;cursor:pointer;-webkit-user-select:none;user-select:none}
+.todo-chk{width:24px;height:24px;border-radius:6px;border:2px solid var(--brd2);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--bg);transition:.15s}
+.todo-chk.on{background:var(--gr);border-color:var(--gr);color:#fff}
+.todo-label{font-size:var(--fs)}
+
+/* CONTACTS */
+.ct-card{background:var(--bg2);border-radius:10px;padding:.625rem .75rem;margin-bottom:.5rem;display:flex;gap:.625rem;align-items:flex-start}
+.ct-photo{width:56px;height:56px;border-radius:8px;object-fit:cover;flex-shrink:0;cursor:pointer;border:1px solid var(--brd)}
+.ct-photo-ph{width:56px;height:56px;border-radius:8px;border:2px dashed var(--brd2);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;color:var(--txt3);font-size:24px}
+.ct-info{flex:1;min-width:0}
+.ct-name{font-weight:600;font-size:var(--fs)}
+.ct-role{font-size:13px;color:var(--txt2)}
+.ct-det{font-size:13px;color:var(--txt2);margin-top:3px}
+
+/* PHOTOS */
+.photo-strip{display:flex;gap:.5rem;overflow-x:auto;padding-bottom:6px;min-height:100px;align-items:center;-webkit-overflow-scrolling:touch}
+.photo-item{width:92px;height:92px;border-radius:10px;object-fit:cover;flex-shrink:0;cursor:pointer;border:1px solid var(--brd)}
+.photo-add{width:92px;height:92px;border-radius:10px;border:2px dashed var(--brd2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;flex-shrink:0;color:var(--txt3);font-size:13px}
+.photo-add i{font-size:26px}
+.photo-rel{position:relative;flex-shrink:0}
+.photo-del{position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;display:flex;align-items:center;justify-content:center;padding:0;font-size:12px}
+
+/* MEETINGS */
+.mcard{background:var(--bg);border:1px solid var(--brd);border-left:4px solid var(--ac);border-radius:var(--r);padding:.875rem 1rem;margin-bottom:.625rem}
+.mcard-time{font-size:13px;font-weight:600;color:var(--ac);margin-bottom:3px}
+.mcard-co{font-size:var(--fsl);font-weight:600}
+.mcard-det{font-size:13px;color:var(--txt2);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap}
+.mcard-obj{font-size:13px;color:var(--txt2);margin-top:8px;padding:8px 10px;background:var(--bg2);border-radius:8px;line-height:1.5}
+.add-meet-btn{display:flex;align-items:center;gap:8px;padding:.875rem 1rem;border:1px solid var(--brd);border-radius:var(--r);font-size:var(--fs);color:var(--txt2);margin-bottom:.75rem;width:100%;text-align:left}
+
+/* MODAL SHEET */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.modal-bg.open{display:flex}
+.modal-sheet{background:var(--bg);border-radius:16px 16px 0 0;padding:1.25rem 1rem 3rem;width:100%;max-height:92dvh;overflow-y:auto}
+.modal-handle{width:36px;height:4px;background:var(--brd2);border-radius:2px;margin:0 auto 1rem}
+.modal-title{font-size:var(--fsl);font-weight:600;margin-bottom:1rem}
+.field{margin-bottom:.75rem}
+.field label{font-size:13px;color:var(--txt2);display:block;margin-bottom:4px;font-weight:500}
+.modal-btns{display:flex;gap:8px;margin-top:.875rem}
+.modal-btns .bp{flex:1;padding:13px;font-size:var(--fs);font-weight:600;background:var(--ac);color:#fff;border:none;border-radius:10px}
+.modal-btns .bs{padding:13px 16px;font-size:var(--fs);border:1px solid var(--brd);border-radius:10px;color:var(--txt)}
+
+/* LOGIN */
+#login{height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:5rem 1.5rem 2rem;overflow-y:auto}
+.login-logo{text-align:center;margin-bottom:2rem}
+.login-logo .brand{font-size:13px;font-weight:600;color:var(--ac);letter-spacing:1.5px;margin-bottom:6px}
+.login-logo h1{font-size:28px;font-weight:700}
+.login-logo p{font-size:14px;color:var(--txt2);margin-top:4px}
+.login-box{background:var(--bg);border:1px solid var(--brd);border-radius:16px;padding:1.5rem;width:100%;max-width:400px}
+.login-box h2{font-size:20px;font-weight:600;margin-bottom:6px}
+.login-box p{font-size:15px;color:var(--txt2);margin-bottom:1.25rem;line-height:1.5}
+.login-box input{font-size:18px;padding:13px}
+.login-box .btn-login{width:100%;padding:14px;font-size:var(--fs);font-weight:600;background:var(--ac);color:#fff;border:none;border-radius:10px;margin-top:.875rem}
+
+/* FULLSCREEN PHOTO */
+#photo-fs{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:100;display:none;align-items:center;justify-content:center;cursor:pointer}
+#photo-fs.open{display:flex}
+#photo-fs img{max-width:96vw;max-height:92dvh;object-fit:contain;border-radius:10px}
+
+/* INSTALL BANNER */
+#install-banner{display:none;background:var(--ac);color:#fff;padding:.75rem 1rem;font-size:14px;align-items:center;gap:10px;flex-shrink:0}
+#install-banner.show{display:flex}
+#install-banner button{margin-left:auto;background:#fff;color:var(--ac);border:none;border-radius:6px;padding:5px 12px;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0}
+
+/* EMPTY */
+.empty{text-align:center;padding:3rem 1rem;color:var(--txt2)}
+.voice-btn{width:44px;height:44px;border-radius:50%;border:2px solid var(--brd2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;flex-shrink:0;transition:.2s}
+.voice-btn.recording{background:#e53935;border-color:#e53935;color:#fff;animation:pulse-rec 1s infinite}
+.ocr-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;font-size:13px;font-weight:600;background:linear-gradient(135deg,#7B2D8B,#185FA5);color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:.5rem;width:100%}
+.ocr-btn:disabled{opacity:.6;cursor:not-allowed}
+.ocr-status{font-size:12px;color:var(--txt2);margin-top:4px;min-height:18px}
+@keyframes pulse-rec{0%,100%{box-shadow:0 0 0 0 rgba(229,57,53,.4)}50%{box-shadow:0 0 0 8px rgba(229,57,53,0)}}
+.empty i{font-size:48px;display:block;margin-bottom:.875rem;color:var(--brd2)}
+.empty p{font-size:var(--fs);line-height:1.6}
+
+/* SYNC modal */
+.sync-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:60;display:none;align-items:center;justify-content:center;padding:1.5rem}
+.sync-modal.open{display:flex}
+.sync-box{background:var(--bg);border-radius:16px;padding:1.5rem;width:100%;max-width:400px}
+.sync-box h2{font-size:18px;font-weight:600;margin-bottom:.75rem}
+.sync-box p{font-size:14px;color:var(--txt2);margin-bottom:1rem;line-height:1.5}
+.sync-box textarea{min-height:120px;font-size:12px;font-family:monospace}
+.sync-btns{display:flex;gap:8px;margin-top:.75rem;flex-wrap:wrap}
+.sync-btns button{padding:10px 16px;font-size:14px;font-weight:600;border-radius:10px;flex:1}
+.sync-btns .bp{background:var(--ac);color:#fff;border:none}
+.sync-btns .bs{border:1px solid var(--brd);color:var(--txt)}
+
+input[type=file]{display:none}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-logo">
+    <div class="brand">PROSEP / TECTONIK</div>
+    <h1>FESPA 2026</h1>
+    <p>Barcelona · 19-22 Mai 2026</p>
+  </div>
+  <div class="login-box">
+    <h2>Cine esti?</h2>
+    <p>Datele sunt salvate pe telefon si pot fi sincronizate cu echipa via export/import JSON.</p>
+    <input type="text" id="name-input" placeholder="Ionut / Elena / ..." autocomplete="off">
+    <button class="btn-login" onclick="login()">Intra</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;flex-direction:column;height:100dvh">
+
+  <div id="install-banner">
+    <i class="ti ti-device-mobile-down"></i>
+    <span>Instaleaza pe ecran pentru acces rapid offline</span>
+    <button onclick="installApp()">Instaleaza</button>
+  </div>
+
+  <div class="hdr">
+    <div>
+      <h1>FESPA 2026 · <span id="me-label" style="color:var(--ac)"></span></h1>
+      <p>Barcelona · 19-22 Mai 2026 · Fira Gran Via</p>
+    </div>
+    <div class="hdr-btns">
+      <button class="ibtn" onclick="openSettings()" title="Setari / API Key"><i class="ti ti-settings"></i></button>
+      <button class="ibtn" onclick="openSync()" title="Sync cu echipa"><i class="ti ti-arrows-exchange"></i></button>
+      <button class="ibtn" onclick="exportCSV()" title="Export CSV"><i class="ti ti-download"></i></button>
+      <button class="ibtn add" onclick="openVisitModal()" title="Vizita noua" aria-label="Vizita noua"><i class="ti ti-plus"></i></button>
+    </div>
+  </div>
+
+  <div class="info-bar">
+    <span id="save-label"><i class="ti ti-cloud-check" style="font-size:13px;color:var(--gr)"></i> Salvat local</span>
+    <button onclick="openSync()"><i class="ti ti-arrows-exchange"></i> Sync echipa</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-visits" onclick="switchTab('visits')">
+      <i class="ti ti-building-store"></i> Vizite <span class="tab-n" id="tn-v">0</span>
+    </div>
+    <div class="tab" id="tab-meetings" onclick="switchTab('meetings')">
+      <i class="ti ti-calendar-event"></i> Meetinguri <span class="tab-n" id="tn-m">0</span>
+    </div>
+  </div>
+
+  <div class="panel active" id="panel-visits">
+    <div style="margin-bottom:.75rem">
+      <input type="search" id="search-input" placeholder="Cauta companie, stand, note..." oninput="filterVisits(this.value)"
+        style="width:100%;font-size:15px;padding:10px 12px 10px 36px;border:1px solid var(--brd2);border-radius:10px;background:var(--bg2)">
+      <i class="ti ti-search" style="position:absolute;margin-left:-calc(100% - 12px);font-size:16px;color:var(--txt3);pointer-events:none;transform:translate(10px,-32px)"></i>
+    </div>
+    <div id="visit-list"></div>
+  </div>
+
+  <div class="panel" id="panel-meetings">
+    <button class="add-meet-btn" onclick="openMeetModal()">
+      <i class="ti ti-plus"></i> Adauga meeting / programare
+    </button>
+    <div id="meet-list"></div>
+  </div>
+</div>
+
+<!-- VISIT MODAL -->
+<div class="modal-bg" id="modal-visit">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Vizita noua</div>
+    <div class="field"><label>Companie *</label><input type="text" id="v-co" placeholder="ex: Hexis, Laitin New Materials..." autocomplete="off"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="field"><label>Stand</label><input type="text" id="v-st" placeholder="ex: 2-C50" autocomplete="off"></div>
+      <div class="field"><label>Hala</label>
+        <select id="v-ha">
+          <option value="2">Hall 2</option>
+          <option value="2.1">Hall 2.1</option>
+          <option value="3">Hall 3</option>
+          <option value="—">Alta</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="field"><label>Zi eveniment</label>
+        <select id="v-day">
+          <option value="">— selecteaza —</option>
+          <option value="Mar 19 mai">Mar 19 mai</option>
+          <option value="Mie 20 mai">Mie 20 mai</option>
+          <option value="Joi 21 mai">Joi 21 mai</option>
+          <option value="Vin 22 mai">Vin 22 mai</option>
+        </select>
+      </div>
+      <div class="field"><label>Tip stand</label>
+        <select id="v-type">
+          <option value="">— optional —</option>
+          <option value="Producator">Producator</option>
+          <option value="Distribuitor">Distribuitor</option>
+          <option value="Vizitator">Vizitator</option>
+          <option value="Meeting">Meeting</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Note initiale</label><textarea id="v-no" placeholder="Primele impresii, produse de interes..." style="min-height:80px"></textarea></div>
+    <div class="modal-btns">
+      <button class="bp" onclick="saveVisit()">Adauga vizita</button>
+      <button class="bs" onclick="closeModal('modal-visit')">Anuleaza</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div class="modal-bg" id="modal-contact">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Adauga contact</div>
+    <div style="display:flex;gap:.875rem;align-items:center;margin-bottom:1rem">
+      <div>
+        <div id="ct-photo-prev" style="width:68px;height:68px;border-radius:10px;border:2px dashed var(--brd2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--txt3);font-size:13px;flex-shrink:0;overflow:hidden;margin-bottom:6px">
+          <i class="ti ti-id-badge-2" style="font-size:26px"></i>
+          <span>Foto card</span>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button onclick="document.getElementById('fi-ct-cam').click()" style="flex:1;padding:6px 8px;font-size:12px;font-weight:600;background:var(--ac);color:#fff;border:none;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:4px"><i class="ti ti-camera"></i> Camera</button>
+          <button onclick="document.getElementById('fi-ct-gal').click()" style="flex:1;padding:6px 8px;font-size:12px;font-weight:600;border:1px solid var(--brd2);border-radius:8px;display:flex;align-items:center;justify-content:center;gap:4px"><i class="ti ti-photo"></i> Galerie</button>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--txt3);line-height:1.5">Toate campurile sunt optionale.<br>Salveaza cu ce ai — chiar si doar poza.</div>
+    </div>
+    <button class="ocr-btn" id="ocr-btn" onclick="runOCR()" disabled>
+      <i class="ti ti-sparkles"></i> Recunoaste text automat din poza
+    </button>
+    <div class="ocr-status" id="ocr-status"></div>
+    <div class="field"><label>Nume</label><input type="text" id="ct-nm" placeholder="Prenume Nume" autocomplete="off"></div>
+    <div class="field"><label>Functie</label><input type="text" id="ct-ro" placeholder="Export Manager, Director..." autocomplete="off"></div>
+    <div class="field"><label>Email</label><input type="email" id="ct-em" placeholder="email@companie.com"></div>
+    <div class="field"><label>Telefon / WhatsApp</label><input type="tel" id="ct-ph" placeholder="+xx xxx xxx xxx"></div>
+    <div class="field"><label>Companie (daca difera)</label><input type="text" id="ct-co2" placeholder="Companie..." autocomplete="off"></div>
+    <div class="field"><label>Website</label><input type="url" id="ct-web" placeholder="www.companie.com" autocomplete="off" inputmode="url"></div>
+    <div class="modal-btns">
+      <button class="bp" onclick="saveContact()">Salveaza contact</button>
+      <button class="bs" onclick="closeModal('modal-contact')">Anuleaza</button>
+    </div>
+  </div>
+</div>
+
+<!-- MEETING MODAL -->
+<div class="modal-bg" id="modal-meet">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Meeting / Programare</div>
+    <div class="field"><label>Companie / Persoana *</label><input type="text" id="m-co" placeholder="Companie sau persoana" autocomplete="off"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="field"><label>Zi si ora</label><input type="text" id="m-ti" placeholder="Mar 20, 14:00" autocomplete="off"></div>
+      <div class="field"><label>Locatie</label><input type="text" id="m-lo" placeholder="Stand, lounge..." autocomplete="off"></div>
+    </div>
+    <div class="field"><label>Persoana de contact</label><input type="text" id="m-ct" placeholder="Nume + functie" autocomplete="off"></div>
+    <div class="field"><label>Obiectiv</label><textarea id="m-ob" placeholder="Ce vrei sa obtii?" style="min-height:70px"></textarea></div>
+    <div class="modal-btns">
+      <button class="bp" onclick="saveMeeting()">Salveaza meeting</button>
+      <button class="bs" onclick="closeModal('modal-meet')">Anuleaza</button>
+    </div>
+  </div>
+</div>
+
+<!-- SYNC MODAL -->
+<div class="sync-modal" id="modal-sync">
+  <div class="sync-box">
+    <h2>Sincronizare echipa</h2>
+    <p>Exporta datele tale ca JSON si trimite colegului via WhatsApp. El importa si se combina automat.</p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="bp" style="padding:12px;font-size:14px;font-weight:600;background:var(--ac);color:#fff;border:none;border-radius:10px" onclick="exportJSON()">
+        <i class="ti ti-share"></i> Exporta datele mele (JSON)
+      </button>
+      <div style="font-size:13px;color:var(--txt2);text-align:center">— sau importa datele colegului —</div>
+      <textarea id="import-json" placeholder="Lipeste aici JSON-ul primit de la coleg..." style="min-height:100px;font-size:12px;font-family:monospace"></textarea>
+      <button onclick="importJSON()" style="padding:12px;font-size:14px;font-weight:600;border:1px solid var(--brd);border-radius:10px;color:var(--txt)">
+        <i class="ti ti-file-import"></i> Importa si combina
+      </button>
+    </div>
+    <div class="sync-btns" style="margin-top:.875rem">
+      <button class="bs" onclick="closeModal('modal-sync')">Inchide</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="sync-modal" id="modal-settings">
+  <div class="sync-box">
+    <h2>Setari</h2>
+    <p>Cheia API este necesara pentru recunoasterea automata a textului de pe cartile de vizita (OCR). Se salveaza local pe telefon.</p>
+    <div class="field" style="margin-bottom:.75rem">
+      <label style="font-size:13px;color:var(--txt2);display:block;margin-bottom:4px;font-weight:500">Cheie API Anthropic</label>
+      <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." autocomplete="off"
+        style="font-size:14px;font-family:monospace">
+    </div>
+    <div style="font-size:12px;color:var(--txt3);margin-bottom:.875rem;line-height:1.5">
+      Obtine cheia de pe <strong>console.anthropic.com</strong> → API Keys.<br>
+      Se stocheaza doar local pe acest telefon, nu se trimite nicaieri.
+    </div>
+    <div class="sync-btns">
+      <button class="bp" onclick="saveApiKey()">Salveaza cheia</button>
+      <button class="bs" onclick="closeModal('modal-settings')">Inchide</button>
+    </div>
+  </div>
+</div>
+
+<!-- FULLSCREEN PHOTO -->
+<div id="photo-fs" onclick="this.classList.remove('open')">
+  <img id="photo-fs-img" src="" alt="Foto">
+</div>
+
+<!-- Visit photos: camera + gallery -->
+<input type="file" id="fi-vp-cam" accept="image/*" capture="environment" onchange="handleVisitPhoto(event)">
+<input type="file" id="fi-vp-gal" accept="image/*" onchange="handleVisitPhoto(event)">
+<!-- Contact photo (new): camera + gallery -->
+<input type="file" id="fi-ct-cam" accept="image/*" capture="environment" onchange="handleCtPhoto(event)">
+<input type="file" id="fi-ct-gal" accept="image/*" onchange="handleCtPhoto(event)">
+<!-- Contact photo (existing): camera + gallery -->
+<input type="file" id="fi-ct-ex-cam" accept="image/*" capture="environment" onchange="handleCtExPhoto(event)">
+<input type="file" id="fi-ct-ex-gal" accept="image/*" onchange="handleCtExPhoto(event)">
+
+<script>
+const TODOS = ['Email follow-up','Solicita mostra','Trimite oferta','Programeaza meeting','Cerceteaza produse','Alta actiune'];
+let ME = '', DB = {visits:[], meetings:[]};
+let curVid = null, curCtId = null, curCtPhoto = null;
+let deferredPrompt = null;
+let blurListenerAdded = false;
+
+// Global photo cache - avoids embedding base64 in onclick attributes
+window.PC = {};
+
+// ── PWA INSTALL ──────────────────────────────────────────────────────────────
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
+  document.getElementById('install-banner').classList.add('show');
+});
+function installApp() {
+  if (!deferredPrompt) {
+    alert('Pentru a instala:\n1. Meniu Chrome (3 puncte sus-dreapta)\n2. "Adauga pe ecranul de start"\n3. Confirma');
+    return;
+  }
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => {
+    deferredPrompt = null;
+    document.getElementById('install-banner').classList.remove('show');
+  });
+}
+
+// ── STORAGE ──────────────────────────────────────────────────────────────────
+function save() {
+  try {
+    // Strip open state before saving - always reload closed
+    const toSave = {
+      visits: DB.visits.map(v => ({...v, open: false})),
+      meetings: DB.meetings
+    };
+    localStorage.setItem('fespa26_db', JSON.stringify(toSave));
+    const t = new Date().toLocaleTimeString('ro-RO', {hour:'2-digit',minute:'2-digit'});
+    const totalCt = DB.visits.reduce((s,v)=>s+(v.contacts||[]).length, 0);
+    const totalTd = DB.visits.reduce((s,v)=>s+Object.values(v.todos||{}).filter(Boolean).length, 0);
+    const lbl = document.getElementById('save-label');
+    if (lbl) lbl.innerHTML = '<i class="ti ti-cloud-check" style="font-size:13px;color:var(--gr)"></i> Salvat ' + t + ' &nbsp;·&nbsp; ' + totalCt + ' contacte &nbsp;·&nbsp; ' + totalTd + ' actiuni';
+  } catch(e) { alert('Eroare la salvare: ' + e.message); }
+}
+
+function loadDB() {
+  try {
+    const d = localStorage.getItem('fespa26_db');
+    if (d) DB = JSON.parse(d);
+    if (!DB.visits) DB.visits = [];
+    if (!DB.meetings) DB.meetings = [];
+  } catch(e) { DB = {visits:[], meetings:[]}; }
+}
+
+// ── IMAGE COMPRESS ─────────────────────────────────────────────────────────────
+function compressImg(file, cb) {
+  const r = new FileReader();
+  r.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 1200, Q = 0.72;
+      let w = img.width, h = img.height;
+      if (w > MAX) { h = Math.round(h*MAX/w); w = MAX; }
+      const cvs = document.createElement('canvas');
+      cvs.width = w; cvs.height = h;
+      cvs.getContext('2d').drawImage(img, 0, 0, w, h);
+      cb(cvs.toDataURL('image/jpeg', Q));
+    };
+    img.src = ev.target.result;
+  };
+  r.readAsDataURL(file);
+}
+
+// ── CLIPBOARD ────────────────────────────────────────────────────────────────
+function copyToClipboard(text, btn) {
+  const done = () => {
+    if (!btn) return;
+    const o = btn.innerHTML;
+    btn.innerHTML = '<i class="ti ti-check"></i>';
+    setTimeout(() => { btn.innerHTML = o; }, 1500);
+  };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+  if (cb) cb();
+}
+
+// ── SHOW PHOTO ───────────────────────────────────────────────────────────────
+function showPhoto(key) {
+  const src = window.PC[key] || key;
+  if (!src) return;
+  document.getElementById('photo-fs-img').src = src;
+  document.getElementById('photo-fs').classList.add('open');
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+function login() {
+  const v = document.getElementById('name-input').value.trim();
+  if (!v) return document.getElementById('name-input').focus();
+  ME = v;
+  try { localStorage.setItem('fespa26_me', ME); } catch(e) {}
+  loadDB();
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('me-label').textContent = ME;
+  initBlurDelegate();
+  renderAll();
+}
+
+// ── TAB ───────────────────────────────────────────────────────────────────────
+function switchTab(t) {
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  document.getElementById('panel-'+t).classList.add('active');
+}
+
+// ── MODALS ────────────────────────────────────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function openVisitModal() {
+  ['v-co','v-st','v-no'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  ['v-ha','v-day','v-type'].forEach(id => { const el = document.getElementById(id); if(el) el.selectedIndex = 0; });
+  openModal('modal-visit');
+  setTimeout(() => { const el = document.getElementById('v-co'); if(el) el.focus(); }, 200);
+}
+
+function openMeetModal() {
+  ['m-co','m-ti','m-lo','m-ct','m-ob'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  openModal('modal-meet');
+  setTimeout(() => { const el = document.getElementById('m-co'); if(el) el.focus(); }, 200);
+}
+
+function openSync() {
+  openModal('modal-sync');
+  const el = document.getElementById('import-json');
+  if (el) el.value = '';
+}
+
+function openSettings() {
+  const keyEl = document.getElementById('api-key-input');
+  if (keyEl) {
+    const saved = getApiKey();
+    keyEl.value = saved ? '••••••••••••••••' : '';
+    keyEl.placeholder = saved ? 'Cheia salvata (editeaza pt schimbare)' : 'sk-ant-api03-...';
+  }
+  openModal('modal-settings');
+}
+
+// ── VISIT CRUD ────────────────────────────────────────────────────────────────
+function saveVisit() {
+  const coEl = document.getElementById('v-co');
+  const co = coEl ? coEl.value.trim() : '';
+  if (!co) { if(coEl) coEl.focus(); return; }
+  const id = 'v_' + Date.now();
+  DB.visits.unshift({
+    id,
+    company: co,
+    stand: document.getElementById('v-st').value.trim(),
+    hall: document.getElementById('v-ha').value,
+    day: document.getElementById('v-day').value,
+    vtype: document.getElementById('v-type').value,
+    notes: document.getElementById('v-no').value.trim(),
+    todos: {}, contacts: [], photos: [],
+    by: ME, at: Date.now(), open: true
+  });
+  save();
+  closeModal('modal-visit');
+  renderVisits();
+  setTimeout(() => {
+    const el = document.getElementById('card-'+id);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 150);
+}
+
+function toggleVisit(id) {
+  const v = DB.visits.find(x => x.id === id);
+  if (!v) return;
+  v.open = !v.open;
+  renderVisits();
+}
+
+function collapseBack(id) {
+  const v = DB.visits.find(x => x.id === id);
+  if (!v) return;
+  v.open = false;
+  save();
+  renderVisits();
+  setTimeout(() => {
+    const el = document.getElementById('card-'+id);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 80);
+}
+
+function delVisit(vid) {
+  if (!confirm('Stergi aceasta vizita si toate datele ei?')) return;
+  DB.visits = DB.visits.filter(x => x.id !== vid);
+  save();
+  renderVisits();
+}
+
+// ── NOTES ─────────────────────────────────────────────────────────────────────
+function initBlurDelegate() {
+  if (blurListenerAdded) return;
+  blurListenerAdded = true;
+  const el = document.getElementById('visit-list');
+  if (!el) return;
+  el.addEventListener('blur', function(e) {
+    if (!e.target || e.target.tagName !== 'TEXTAREA') return;
+    if (!e.target.id || !e.target.id.startsWith('nt-')) return;
+    const vid = e.target.id.slice(3);
+    const v = DB.visits.find(x => x.id === vid);
+    if (!v) return;
+    if (e.target.value !== v.notes) {
+      v.notes = e.target.value;
+      v.notesBy = ME;
+      save();
+    }
+  }, true);
+}
+
+function saveNotes(vid) {
+  const v = DB.visits.find(x => x.id === vid);
+  if (!v) return;
+  const ta = document.getElementById('nt-'+vid);
+  if (!ta) return;
+  v.notes = ta.value;
+  v.notesBy = ME;
+  save();
+  const btn = document.getElementById('snb-'+vid);
+  if (btn) {
+    const o = btn.innerHTML;
+    btn.innerHTML = '<i class="ti ti-check"></i> Salvat!';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.innerHTML = o; btn.classList.remove('ok'); }, 1500);
+  }
+}
+
+// ── TODOS ─────────────────────────────────────────────────────────────────────
+function toggleTodo(vid, todo, itemEl) {
+  const v = DB.visits.find(x => x.id === vid);
+  if (!v) return;
+  if (!v.todos) v.todos = {};
+  v.todos[todo] = !v.todos[todo];
+  save();
+  // Surgical DOM update - no full re-render
+  if (itemEl) {
+    const chk = itemEl.querySelector('.todo-chk');
+    if (chk) chk.classList.toggle('on', !!v.todos[todo]);
+  }
+  // Update badge on card header
+  const done = Object.values(v.todos).filter(Boolean).length;
+  const badge = document.getElementById('tdb-'+vid);
+  if (badge) {
+    badge.textContent = done;
+    badge.style.display = done > 0 ? 'inline' : 'none';
+  }
+  // Update save-label stats
+  const totalTd = DB.visits.reduce((s,v)=>s+Object.values(v.todos||{}).filter(Boolean).length, 0);
+  const totalCt = DB.visits.reduce((s,v)=>s+(v.contacts||[]).length, 0);
+  const t = new Date().toLocaleTimeString('ro-RO', {hour:'2-digit',minute:'2-digit'});
+  const lbl = document.getElementById('save-label');
+  if (lbl) lbl.innerHTML = '<i class="ti ti-cloud-check" style="font-size:13px;color:var(--gr)"></i> Salvat ' + t + ' &nbsp;·&nbsp; ' + totalCt + ' contacte &nbsp;·&nbsp; ' + totalTd + ' actiuni';
+}
+
+// ── CONTACTS ──────────────────────────────────────────────────────────────────
+function openContactModal(vid) {
+  curVid = vid;
+  curCtPhoto = null;
+  ['ct-nm','ct-ro','ct-em','ct-ph','ct-co2','ct-web'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const prev = document.getElementById('ct-photo-prev');
+  if (prev) prev.innerHTML = '<i class="ti ti-id-badge-2" style="font-size:26px"></i><span>Foto card</span>';
+  delete window.PC['ct_prev'];
+  openModal('modal-contact');
+}
+
+function saveContact() {
+  const nm  = (document.getElementById('ct-nm').value  || '').trim();
+  const ro  = (document.getElementById('ct-ro').value  || '').trim();
+  const em  = (document.getElementById('ct-em').value  || '').trim();
+  const ph  = (document.getElementById('ct-ph').value  || '').trim();
+  const co2 = (document.getElementById('ct-co2').value || '').trim();
+  const web = (document.getElementById('ct-web').value || '').trim().replace(/^https?:\/\//i,'');
+  if (!nm && !ro && !em && !ph && !curCtPhoto) {
+    alert('Adauga cel putin un camp sau o poza.');
+    return;
+  }
+  const v = DB.visits.find(x => x.id === curVid);
+  if (!v) return;
+  if (!v.contacts) v.contacts = [];
+  const cid = 'ct_' + Date.now();
+  if (curCtPhoto) window.PC[cid] = curCtPhoto;
+  v.contacts.push({id: cid, name: nm, role: ro, email: em, phone: ph, company: co2, website: web, photo: !!curCtPhoto, by: ME});
+  save();
+  closeModal('modal-contact');
+  renderVisits();
+}
+
+function delContact(vid, cid) {
+  const v = DB.visits.find(x => x.id === vid);
+  if (!v) return;
+  v.contacts = (v.contacts||[]).filter(c => c.id !== cid);
+  delete window.PC[cid];
+  save();
+  renderVisits();
+}
+
+function addPhotoToContact(vid, cid, mode) {
+  curVid = vid;
+  curCtId = cid;
+  document.getElementById(mode === 'cam' ? 'fi-ct-ex-cam' : 'fi-ct-ex-gal').click();
+}
+
+// ── VISIT PHOTOS ──────────────────────────────────────────────────────────────
+function triggerVisitPhoto(vid, mode) {
+  curVid = vid;
+  document.getElementById(mode === 'cam' ? 'fi-vp-cam' : 'fi-vp-gal').click();
+}
+
+function handleVisitPhoto(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  compressImg(f, b64 => {
+    const v = DB.visits.find(x => x.id === curVid);
+    if (!v) return;
+    if (!v.photos) v.photos = [];
+    const pid = 'p_' + Date.now();
+    window.PC[pid] = b64;
+    v.photos.push({id: pid, by: ME});
+    save();
+    renderVisits();
+  });
+  e.target.value = '';
+}
+
+function handleCtPhoto(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  compressImg(f, b64 => {
+    curCtPhoto = b64;
+    const p = document.getElementById('ct-photo-prev');
+    if (p) p.innerHTML = '<img src="' + b64 + '" style="width:68px;height:68px;object-fit:cover;border-radius:8px;cursor:pointer" onclick="showPhoto(\'ct_prev\')" alt="Preview">';
+    window.PC['ct_prev'] = b64;
+    onContactPhotoAdded();
+  });
+  e.target.value = '';
+}
+
+function handleCtExPhoto(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  const vid = curVid, cid = curCtId;
+  compressImg(f, b64 => {
+    window.PC[cid] = b64;
+    const v = DB.visits.find(x => x.id === vid);
+    if (!v) return;
+    v.contacts = (v.contacts||[]).map(c => c.id === cid ? {...c, photo: true} : c);
+    save();
+    renderVisits();
+  });
+  e.target.value = '';
+}
+
+function delPhoto(vid, pid) {
+  const v = DB.visits.find(x => x.id === vid);
+  if (!v) return;
+  v.photos = (v.photos||[]).filter(p => p.id !== pid);
+  delete window.PC[pid];
+  save();
+  renderVisits();
+}
+
+// ── MEETINGS ──────────────────────────────────────────────────────────────────
+function saveMeeting() {
+  const coEl = document.getElementById('m-co');
+  const co = coEl ? coEl.value.trim() : '';
+  if (!co) { if(coEl) coEl.focus(); return; }
+  DB.meetings.push({
+    id: 'm_' + Date.now(),
+    company: co,
+    time: document.getElementById('m-ti').value.trim(),
+    loc:  document.getElementById('m-lo').value.trim(),
+    contact: document.getElementById('m-ct').value.trim(),
+    obj: document.getElementById('m-ob').value.trim(),
+    by: ME
+  });
+  save();
+  closeModal('modal-meet');
+  renderMeetings();
+}
+
+function delMeeting(mid) {
+  if (!confirm('Stergi acest meeting?')) return;
+  DB.meetings = DB.meetings.filter(m => m.id !== mid);
+  save();
+  renderMeetings();
+}
+
+// ── SYNC / EXPORT ─────────────────────────────────────────────────────────────
+function exportJSON() {
+  // Include photo cache in export so contacts with photos transfer correctly
+  const data = JSON.stringify({by: ME, ts: Date.now(), visits: DB.visits, meetings: DB.meetings, photos: window.PC}, null, 0);
+  const blob = new Blob([data], {type:'application/json'});
+  const fname = 'FESPA2026_' + ME + '_' + new Date().toISOString().slice(0,10) + '.json';
+  const file = new File([blob], fname, {type:'application/json'});
+  if (navigator.canShare && navigator.canShare({files:[file]})) {
+    navigator.share({files:[file], title:'FESPA 2026 date ' + ME}).catch(() => fallbackJSON(data, fname));
+  } else {
+    fallbackJSON(data, fname);
+  }
+}
+
+function fallbackJSON(data, fname) {
+  const a = document.createElement('a');
+  a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(data);
+  a.download = fname || 'FESPA2026.json';
+  a.click();
+}
+
+function importJSON() {
+  const raw = (document.getElementById('import-json').value || '').trim();
+  if (!raw) { alert('Lipeste JSON-ul primit de la coleg.'); return; }
+  try {
+    const d = JSON.parse(raw);
+    const inV = d.visits || [];
+    const inM = d.meetings || [];
+    const inP = d.photos || {};
+    const existV = new Set(DB.visits.map(x => x.id));
+    const existM = new Set(DB.meetings.map(x => x.id));
+    let addedV = 0, addedM = 0;
+    inV.forEach(v => { if (!existV.has(v.id)) { DB.visits.push(v); addedV++; } });
+    inM.forEach(m => { if (!existM.has(m.id)) { DB.meetings.push(m); addedM++; } });
+    // Merge photo cache
+    Object.assign(window.PC, inP);
+    DB.visits.sort((a,b) => b.at - a.at);
+    save();
+    renderAll();
+    closeModal('modal-sync');
+    alert('Importat cu succes: +' + addedV + ' vizite, +' + addedM + ' meetinguri.');
+  } catch(e) { alert('JSON invalid.\n' + e.message); }
+}
+
+function exportCSV() {
+  const rows = [['Companie','Stand','Hala','Zi','Ora','Note','Actiuni','Contacte','Poze','Adaugat de']];
+  DB.visits.forEach(v => {
+    const acts = Object.entries(v.todos||{}).filter(([,on])=>on).map(([t])=>t).join('; ');
+    rows.push([v.company, v.stand||'', v.hall||'', v.day||'', new Date(v.at).toLocaleString('ro-RO'), v.notes||'', acts, (v.contacts||[]).length, (v.photos||[]).length, v.by]);
+  });
+  rows.push([], ['=== CONTACTE ===','Vizita','Comp contact','Nume','Functie','Email','Telefon','Website']);
+  DB.visits.forEach(v => (v.contacts||[]).forEach(c => rows.push(['', v.company, c.company||'', c.name||'', c.role||'', c.email||'', c.phone||'', c.website||''])));
+  rows.push([], ['=== MEETINGURI ===','Companie','Zi/Ora','Locatie','Contact','Obiectiv','Adaugat de']);
+  DB.meetings.forEach(m => rows.push(['', m.company, m.time||'', m.loc||'', m.contact||'', m.obj||'', m.by||'']));
+  const csv = '\uFEFF' + rows.map(r => Array.isArray(r) ? r.map(v => '"' + String(v||'').replace(/"/g,'""') + '"').join(',') : '').join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'FESPA2026_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function initials(n) {
+  return (n||'?').split(' ').filter(Boolean).slice(0,2).map(w => w[0].toUpperCase()).join('');
+}
+
+function updateStats() {
+  const tnv = document.getElementById('tn-v');
+  const tnm = document.getElementById('tn-m');
+  if (tnv) tnv.textContent = DB.visits.length;
+  if (tnm) tnm.textContent = DB.meetings.length;
+}
+
+function renderAll() { renderVisits(); renderMeetings(); }
+
+function renderVisits() {
+  const el = document.getElementById('visit-list');
+  if (!el) return;
+  updateStats();
+
+  if (!DB.visits.length) {
+    el.innerHTML = '<div class="empty"><i class="ti ti-building-store"></i><p>Nicio vizita inregistrata.<br>Apasa <strong>+</strong> sus-dreapta dupa primul stand vizitat.</p></div>';
+    return;
+  }
+
+  // Apply search filter
+  const visitsToShow = searchQuery
+    ? DB.visits.filter(v => {
+        const hay = [v.company, v.stand, v.hall, v.day, v.notes, v.vtype,
+          ...(v.contacts||[]).flatMap(c=>[c.name,c.company,c.role,c.email,c.phone])
+        ].join(' ').toLowerCase();
+        return hay.includes(searchQuery);
+      })
+    : DB.visits;
+
+  if (searchQuery && !visitsToShow.length) {
+    el.innerHTML = '<div class="empty"><i class="ti ti-search"></i><p>Niciun rezultat pentru<br><strong>"' + searchQuery + '"</strong></p></div>';
+    return;
+  }
+
+  el.innerHTML = visitsToShow.map(v => {
+    const nCt  = (v.contacts||[]).length;
+    const nPh  = (v.photos||[]).length;
+    const tdDone = Object.values(v.todos||{}).filter(Boolean).length;
+    const ts   = new Date(v.at).toLocaleTimeString('ro-RO', {hour:'2-digit',minute:'2-digit'});
+
+    // Build contact rows
+    const ctRows = (v.contacts||[]).map(c => {
+      const hasPhoto = c.photo && window.PC[c.id];
+      const photoEl = hasPhoto
+        ? `<img src="${window.PC[c.id]}" class="ct-photo" onclick="showPhoto('${c.id}')" alt="Card">`
+        : `<div class="ct-photo-ph" style="flex-direction:column;gap:3px">
+          <button onclick="addPhotoToContact('${v.id}','${c.id}','cam')" style="background:var(--ac);color:#fff;border:none;border-radius:6px;padding:3px 7px;font-size:11px;cursor:pointer;width:100%;margin-bottom:2px"><i class="ti ti-camera"></i></button>
+          <button onclick="addPhotoToContact('${v.id}','${c.id}','gal')" style="background:transparent;border:1px solid var(--brd2);border-radius:6px;padding:3px 7px;font-size:11px;cursor:pointer;width:100%"><i class="ti ti-photo"></i></button>
+        </div>`;
+      const emailRow = c.email ? `<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap"><i class="ti ti-mail" style="font-size:12px"></i> ${c.email} <a href="mailto:${c.email}" style="color:var(--ac);font-size:11px;text-decoration:none" title="Trimite email"><i class="ti ti-send"></i></a><button onclick="copyToClipboard('${c.email.replace(/'/g,"\\'")}',this)" style="border:none;background:transparent;color:var(--ac);padding:0;font-size:11px;cursor:pointer" title="Copiaza"><i class="ti ti-copy"></i></button></div>` : '';
+      const phoneRaw = c.phone ? c.phone.replace(/\s/g,'') : '';
+      const phoneRow = c.phone ? `<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap"><i class="ti ti-phone" style="font-size:12px"></i> ${c.phone} <a href="tel:${phoneRaw}" style="color:var(--ac);font-size:11px;text-decoration:none" title="Suna"><i class="ti ti-phone-call"></i></a><a href="https://wa.me/${phoneRaw.replace(/^\+/,'')}" target="_blank" style="color:#25D366;font-size:11px;text-decoration:none" title="WhatsApp"><i class="ti ti-brand-whatsapp"></i></a><button onclick="copyToClipboard('${c.phone.replace(/'/g,"\\'")}',this)" style="border:none;background:transparent;color:var(--ac);padding:0;font-size:11px;cursor:pointer" title="Copiaza"><i class="ti ti-copy"></i></button></div>` : '';
+      const webRow = c.web ? `<div style="display:flex;align-items:center;gap:5px"><i class="ti ti-world" style="font-size:12px"></i> <a href="https://${c.web}" target="_blank" style="color:var(--ac);font-size:13px;text-decoration:none;word-break:break-all">${c.web}</a></div>` : '';
+      return `<div class="ct-card">
+        ${photoEl}
+        <div class="ct-info">
+          ${c.name    ? `<div class="ct-name">${c.name}</div>` : ''}
+          ${c.role    ? `<div class="ct-role">${c.role}</div>` : ''}
+          ${c.company ? `<div class="ct-role" style="color:var(--ac)">${c.company}</div>` : ''}
+          <div class="ct-det">${emailRow}${phoneRow}${c.website ? `<div style="display:flex;align-items:center;gap:5px"><i class="ti ti-world" style="font-size:12px"></i> <a href="https://${c.website}" target="_blank" style="color:var(--ac);font-size:12px;text-decoration:none">${c.website}</a></div>` : ''}</div>
+        </div>
+        <button class="del-btn" onclick="delContact('${v.id}','${c.id}')"><i class="ti ti-x"></i></button>
+      </div>`;
+    }).join('');
+
+    // Build photo strip
+    const photoItems = (v.photos||[]).map(p => {
+      const src = window.PC[p.id];
+      if (!src) return '';
+      return `<div class="photo-rel">
+        <img src="${src}" class="photo-item" onclick="showPhoto('${p.id}')" alt="Poza">
+        <button class="photo-del" onclick="delPhoto('${v.id}','${p.id}')"><i class="ti ti-x"></i></button>
+      </div>`;
+    }).join('');
+
+    // Build todo rows
+    const todoRows = TODOS.map(t => `
+      <div class="todo-item" onclick="toggleTodo('${v.id}','${t}',this)">
+        <div class="todo-chk${(v.todos||{})[t] ? ' on' : ''}"><i class="ti ti-check" style="font-size:13px"></i></div>
+        <span class="todo-label">${t}</span>
+      </div>`).join('');
+
+    const bodyHTML = v.open ? `
+      <button class="back-row" onclick="collapseBack('${v.id}')">
+        <i class="ti ti-arrow-left" style="font-size:15px"></i> Inapoi la lista
+      </button>
+      <div class="vs">
+        <div class="vs-title">Note discutie</div>
+        <textarea id="nt-${v.id}" placeholder="Ce s-a discutat, produse, preturi, conditii...">${(v.notes||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>
+        <div style="display:flex;gap:8px;margin-top:.625rem;align-items:flex-start">
+          <button class="save-btn" id="snb-${v.id}" onclick="saveNotes('${v.id}')" style="flex:1;margin-top:0">
+            <i class="ti ti-device-floppy"></i> Salveaza note
+          </button>
+          <button class="voice-btn" id="vbtn-${v.id}" onclick="toggleVoice('${v.id}')" title="Dictare vocala">
+            <i class="ti ti-microphone"></i>
+          </button>
+        </div>
+      </div>
+      <div class="vs">
+        <div class="vs-title">Actiuni urmatoare</div>
+        ${todoRows}
+      </div>
+      <div class="vs">
+        <div class="vs-title">
+          <span>Contacte (${nCt})</span>
+          <button class="vs-add" onclick="openContactModal('${v.id}')"><i class="ti ti-plus"></i> Adauga</button>
+        </div>
+        ${nCt === 0 ? '<div style="font-size:13px;color:var(--txt3)">Niciun contact inca.</div>' : ctRows}
+      </div>
+      <div class="vs">
+        <div class="vs-title">Poze stand / produse / persoane (${nPh})</div>
+        <div class="photo-strip">
+          <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+            <button onclick="triggerVisitPhoto('${v.id}','cam')" style="width:92px;padding:8px 4px;font-size:12px;font-weight:600;background:var(--ac);color:#fff;border:none;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:4px"><i class="ti ti-camera" style="font-size:16px"></i> Camera</button>
+            <button onclick="triggerVisitPhoto('${v.id}','gal')" style="width:92px;padding:8px 4px;font-size:12px;font-weight:600;border:1px solid var(--brd2);border-radius:10px;display:flex;align-items:center;justify-content:center;gap:4px"><i class="ti ti-photo" style="font-size:16px"></i> Galerie</button>
+          </div>
+          ${photoItems}
+        </div>
+      </div>
+      <div class="vs" style="display:flex;justify-content:space-between;align-items:center">
+        <button class="back-row" style="width:auto;border-radius:10px;padding:.5rem .875rem" onclick="collapseBack('${v.id}')">
+          <i class="ti ti-arrow-left" style="font-size:15px"></i> Inapoi
+        </button>
+        <button class="del-btn" onclick="delVisit('${v.id}')"><i class="ti ti-trash"></i> Sterge vizita</button>
+      </div>` : '';
+
+    return `<div class="vcard" id="card-${v.id}">
+      <div class="vcard-hd" onclick="toggleVisit('${v.id}')">
+        <div class="avatar">${initials(v.company)}</div>
+        <div class="vcard-info">
+          <div class="vcard-name">${v.company}</div>
+          <div class="vcard-meta">
+            ${v.day   ? `<span class="stag" style="background:var(--grl);color:var(--gr)">${v.day}</span>` : ''}
+            ${v.vtype ? `<span class="stag" style="background:var(--bg3);color:var(--txt2)">${v.vtype}</span>` : ''}
+            ${v.stand ? `<span class="stag">${v.hall && v.hall!=='—' ? v.hall+' · ' : ''}${v.stand}</span>` : ''}
+            <span><i class="ti ti-clock" style="font-size:11px"></i> ${ts}</span>
+            ${nCt > 0 ? `<span><i class="ti ti-users" style="font-size:11px"></i> ${nCt}</span>` : ''}
+            ${nPh > 0 ? `<span><i class="ti ti-photo" style="font-size:11px"></i> ${nPh}</span>` : ''}
+            <span id="tdb-${v.id}" style="color:var(--gr);display:${tdDone>0?'inline':'none'}">
+              <i class="ti ti-check" style="font-size:11px"></i> ${tdDone}
+            </span>
+            <span style="font-size:11px;color:var(--txt3);font-style:italic">${v.by}</span>
+          </div>
+        </div>
+        <div class="exp-icon">${v.open ? '−' : '+'}</div>
+      </div>
+      <div class="vcard-body${v.open ? ' open' : ''}">
+        ${bodyHTML}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderMeetings() {
+  const el = document.getElementById('meet-list');
+  if (!el) return;
+  updateStats();
+  if (!DB.meetings.length) {
+    el.innerHTML = '<div class="empty" style="padding:2rem 1rem"><i class="ti ti-calendar-event"></i><p>Niciun meeting programat.</p></div>';
+    return;
+  }
+  const sorted = [...DB.meetings].sort((a,b) => (a.time||'').localeCompare(b.time||''));
+  el.innerHTML = sorted.map(m => `
+    <div class="mcard">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div style="flex:1">
+          ${m.time ? `<div class="mcard-time"><i class="ti ti-clock" style="font-size:12px"></i> ${m.time}${m.loc ? ' · '+m.loc : ''}</div>` : ''}
+          <div class="mcard-co">${m.company}</div>
+          <div class="mcard-det">
+            ${m.contact ? `<span><i class="ti ti-user" style="font-size:12px"></i> ${m.contact}</span>` : ''}
+            <span style="font-size:11px;color:var(--txt3);font-style:italic">${m.by}</span>
+          </div>
+          ${m.obj ? `<div class="mcard-obj">${m.obj}</div>` : ''}
+        </div>
+        <button class="del-btn" onclick="delMeeting('${m.id}')"><i class="ti ti-trash"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+// ── API KEY ───────────────────────────────────────────────────────────────────
+function saveApiKey() {
+  const key = (document.getElementById('api-key-input').value || '').trim();
+  if (!key) { alert('Introdu cheia API.'); return; }
+  try { localStorage.setItem('fespa26_apikey', key); } catch(e) {}
+  closeModal('modal-settings');
+  alert('Cheia API salvata. OCR activ!');
+}
+
+function getApiKey() {
+  try { return localStorage.getItem('fespa26_apikey') || ''; } catch(e) { return ''; }
+}
+
+// ── OCR ───────────────────────────────────────────────────────────────────────
+async function runOCR() {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    alert('Adauga cheia API in Setari (iconita roata din header) pentru a folosi OCR.');
+    openModal('modal-settings');
+    return;
+  }
+  const b64 = window.PC['ct_prev'];
+  if (!b64) { alert('Fa sau alege o poza a cartii de vizita mai intai.'); return; }
+
+  const btn = document.getElementById('ocr-btn');
+  const status = document.getElementById('ocr-status');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader-2"></i> Se analizeaza...'; }
+  if (status) status.textContent = 'Trimit poza catre AI...';
+
+  try {
+    // Strip data URL prefix to get pure base64
+    const base64Data = b64.includes(',') ? b64.split(',')[1] : b64;
+    const mediaType = 'image/jpeg';
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-5',
+        max_tokens: 500,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: { type: 'base64', media_type: mediaType, data: base64Data }
+            },
+            {
+              type: 'text',
+              text: 'Aceasta este o carte de vizita. Extrage toate informatiile si returneaza EXCLUSIV un JSON valid fara text suplimentar, fara markdown, cu structura: {"name":"","role":"","company":"","email":"","phone":"","phone2":"","website":"","address":""}. Daca un camp nu exista, lasa string gol. Numele complet in "name". Functia/titlul in "role". Primul telefon in "phone", al doilea in "phone2". Daca sunt mai multe emailuri, pune-le pe primul. Website fara https:// in campul website. Pastreaza formatele originale.'
+            }
+          ]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || 'Eroare API: ' + response.status);
+    }
+
+    const data = await response.json();
+    const text = (data.content || []).map(b => b.text || '').join('');
+    const clean = text.replace(/```json|```/g,'').trim();
+
+    let parsed;
+    try { parsed = JSON.parse(clean); }
+    catch(e) {
+      // Try to extract JSON from text
+      const match = clean.match(/\{[\s\S]*\}/);
+      if (match) parsed = JSON.parse(match[0]);
+      else throw new Error('Raspuns invalid de la AI');
+    }
+
+    // Fill form fields
+    let filled = 0;
+    const fieldMap = {
+      'ct-nm': parsed.name,
+      'ct-ro': parsed.role,
+      'ct-co2': parsed.company,
+      'ct-em': parsed.email,
+      'ct-ph': parsed.phone,
+      'ct-web': (parsed.website||'').replace(/^https?:\/\//i,'')
+    };
+    Object.entries(fieldMap).forEach(([id, val]) => {
+      if (val && val.trim()) {
+        const el = document.getElementById(id);
+        if (el && !el.value) { el.value = val.trim(); filled++; }
+      }
+    });
+    // If phone2 exists and phone field already filled, try to put in phone field if empty
+    if (parsed.phone2 && parsed.phone2.trim()) {
+      const phEl = document.getElementById('ct-ph');
+      if (phEl && !phEl.value) { phEl.value = parsed.phone2.trim(); filled++; }
+    }
+
+    if (status) status.textContent = filled > 0 ? '✓ ' + filled + ' campuri completate automat!' : 'Niciun camp identificat clar.';
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-refresh"></i> Re-analizeaza'; }
+
+  } catch(err) {
+    console.error('OCR error:', err);
+    if (status) status.textContent = '✗ Eroare: ' + err.message;
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-sparkles"></i> Recunoaste text automat din poza'; }
+  }
+}
+
+// Enable/disable OCR button when photo is added
+function onContactPhotoAdded() {
+  const btn = document.getElementById('ocr-btn');
+  if (btn) { btn.disabled = false; }
+  const status = document.getElementById('ocr-status');
+  if (status) status.textContent = 'Poza adaugata. Apasa butonul pentru recunoastere automata.';
+}
+
+// ── VOICE NOTES ───────────────────────────────────────────────────────────────
+let voiceRecognition = null;
+let voiceActiveVid = null;
+
+async function toggleVoice(vid) {
+  if (voiceActiveVid === vid && voiceRecognition) {
+    voiceRecognition.stop();
+    return;
+  }
+  if (voiceRecognition) voiceRecognition.stop();
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('Dictarea vocala nu este suportata pe acest browser. Incearca Chrome pe Android.');
+    return;
+  }
+
+  const ta = document.getElementById('nt-'+vid);
+  if (!ta) return;
+
+  // Pre-request microphone permission explicitly before SpeechRecognition
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+    stream.getTracks().forEach(t => t.stop()); // release immediately, we just needed permission
+  } catch(permErr) {
+    alert('Nu s-a putut accesa microfonul.\n\nVerifica:\n1. Chrome → bara adresa → iconita lacat/microfon → Permite\n2. Setari telefon → Aplicatii → Chrome → Permisiuni → Microfon → Permite\n\nEroare: ' + permErr.message);
+    const btn2 = document.getElementById('vbtn-'+vid);
+    if (btn2) { btn2.classList.remove('recording'); btn2.innerHTML = '<i class="ti ti-microphone"></i>'; }
+    return;
+  }
+
+  voiceRecognition = new SpeechRecognition();
+  voiceRecognition.lang = 'ro-RO';
+  voiceRecognition.continuous = true;
+  voiceRecognition.interimResults = true;
+
+  const btn = document.getElementById('vbtn-'+vid);
+  voiceActiveVid = vid;
+
+  let finalTranscript = ta.value;
+  if (finalTranscript && !finalTranscript.endsWith(' ')) finalTranscript += ' ';
+
+  voiceRecognition.onstart = () => {
+    if (btn) { btn.classList.add('recording'); btn.innerHTML = '<i class="ti ti-microphone-off"></i>'; }
+  };
+
+  voiceRecognition.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript + ' ';
+      else interim += e.results[i][0].transcript;
+    }
+    ta.value = finalTranscript + interim;
+  };
+
+  voiceRecognition.onend = () => {
+    ta.value = finalTranscript.trim();
+    if (btn) { btn.classList.remove('recording'); btn.innerHTML = '<i class="ti ti-microphone"></i>'; }
+    voiceActiveVid = null;
+    voiceRecognition = null;
+    // Auto-save
+    const v = DB.visits.find(x => x.id === vid);
+    if (v && ta.value !== v.notes) { v.notes = ta.value; v.notesBy = ME; save(); }
+  };
+
+  voiceRecognition.onerror = (e) => {
+    voiceRecognition = null;
+    voiceActiveVid = null;
+    if (btn) { btn.classList.remove('recording'); btn.innerHTML = '<i class="ti ti-microphone"></i>'; }
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+      const isFile = location.protocol === 'file:';
+      if (isFile) {
+        alert('Fisierul este deschis local (file://) — Chrome blocheaza microfonul in acest mod.\n\nSolutie rapida:\n1. In Chrome, scrie in bara de adrese:\n   chrome://flags/#unsafely-treat-insecure-origin-as-secure\n\nSau mai simplu:\n1. Copiaza fisierul pe un server local\n\nCea mai simpla solutie:\n1. Trimite-ti fisierul pe WhatsApp\n2. Deschide-l din WhatsApp → Chrome\n3. Microfonul va functiona');
+      } else {
+        alert('Permisiune microfon refuzata.\n\nIn Chrome Android:\nSetari → Confidentialitate → Setari site → Microfon → Permite pentru acest site.');
+      }
+    } else if (e.error === 'network') {
+      alert('Eroare retea. Verifica conexiunea la internet — dictarea vocala necesita conexiune activa.');
+    } else if (e.error === 'no-speech') {
+      // Silent - just stopped listening, not an error
+    } else {
+      console.warn('Voice error:', e.error);
+    }
+  };
+
+  voiceRecognition.start();
+}
+
+// ── SEARCH ────────────────────────────────────────────────────────────────────
+let searchQuery = '';
+
+function filterVisits(q) {
+  searchQuery = (q || '').toLowerCase().trim();
+  renderVisits();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+(function init() {
+  try {
+    const savedMe = localStorage.getItem('fespa26_me');
+    if (savedMe) {
+      ME = savedMe;
+      loadDB();
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      document.getElementById('me-label').textContent = ME;
+      initBlurDelegate();
+      renderAll();
+    }
+  } catch(e) {}
+
+  const ni = document.getElementById('name-input');
+  if (ni) ni.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+})();
+</script>
+
+</body>
+</html>
